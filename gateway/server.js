@@ -82,7 +82,7 @@ const apis = new Map();
 const payments = [];
 const usedTxHashes = new Set(); // Prevent payment replay
 
-// Provider Scoring System (in-memory + SQLite persisted)
+// Provider Scoring System (in-memory + Turso persisted)
 const defaultStats = {
     'crypto': { success: 0, failure: 0, totalLatency: 0 },
     'weather': { success: 0, failure: 0, totalLatency: 0 },
@@ -91,15 +91,22 @@ const defaultStats = {
     'sentiment': { success: 0, failure: 0, totalLatency: 0 },
     'general': { success: 0, failure: 0, totalLatency: 0 }
 };
-// Load persisted stats and merge with defaults
-const loadedStats = loadProviderStats();
 const providerStats = { ...defaultStats };
-for (const [provider, stats] of Object.entries(loadedStats)) {
-    if (providerStats[provider]) {
-        providerStats[provider] = stats;
+
+// Load persisted stats asynchronously
+(async () => {
+    try {
+        const loadedStats = await loadProviderStats();
+        for (const [provider, stats] of Object.entries(loadedStats)) {
+            if (providerStats[provider]) {
+                providerStats[provider] = stats;
+            }
+        }
+        console.log('[Server] Loaded provider stats from Turso:', Object.keys(loadedStats).length, 'providers');
+    } catch (e) {
+        console.log('[Server] Using default provider stats');
     }
-}
-console.log('[Server] Loaded provider stats from database:', Object.keys(loadedStats).length, 'providers');
+})();
 
 function updateProviderStats(provider, success, latencyMs) {
     if (providerStats[provider]) {
@@ -1033,7 +1040,7 @@ REASON: [one sentence explanation]`;
                     });
 
                     // Save transaction to SQLite
-                    saveTransaction({
+                    await saveTransaction({
                         timestamp: new Date().toISOString(),
                         provider: selectedApi,
                         serviceType: 'x402-payment',
@@ -1507,21 +1514,21 @@ app.get('/providers/stats', (req, res) => {
 // Transaction History
 // =====================
 
-app.get('/transactions/history', (req, res) => {
+app.get('/transactions/history', async (req, res) => {
     const limit = parseInt(req.query.limit) || 50;
-    const history = getTransactionHistory(limit);
+    const history = await getTransactionHistory(limit);
     res.json({
         transactions: history,
         count: history.length,
-        persistence: 'SQLite'
+        persistence: 'Turso'
     });
 });
 
-app.get('/db/stats', (req, res) => {
-    const stats = getDatabaseStats();
+app.get('/db/stats', async (req, res) => {
+    const stats = await getDatabaseStats();
     res.json({
         database: stats,
-        persistence: 'SQLite',
+        persistence: 'Turso',
         tables: ['transactions', 'provider_stats']
     });
 });
