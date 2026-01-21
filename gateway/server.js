@@ -859,7 +859,7 @@ REASON: [one sentence explanation]`;
                         task,
                         output: null,
                         paid: false,
-                        reason: decisionReason
+                        reason: aiReason
                     }
                 });
             }
