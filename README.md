@@ -2,6 +2,7 @@
   <img src="https://img.shields.io/badge/Arc-Testnet-blue?style=for-the-badge" alt="Arc Testnet"/>
   <img src="https://img.shields.io/badge/USDC-Payments-green?style=for-the-badge" alt="USDC"/>
   <img src="https://img.shields.io/badge/x402-Protocol-purple?style=for-the-badge" alt="x402"/>
+  <img src="https://img.shields.io/badge/Gasless-Agents-brightgreen?style=for-the-badge" alt="Gasless"/>
   <img src="https://img.shields.io/badge/Gemini-AI-orange?style=for-the-badge" alt="Gemini AI"/>
 </p>
 
@@ -16,8 +17,8 @@ AI agents that autonomously pay for API access. No human intervention. No credit
 ## 🏆 Hackathon Submission
 
 **Track**: Agentic Commerce on Arc  
-**Demo**: [Live Application](http://localhost:5175)  
-**Video**: [Demo Video](#) *(coming soon)*
+**Demo**: [Live Application](https://arcent.vercel.app)  
+**GitHub**: [github.com/cutepawss/arcent](https://github.com/cutepawss/arcent)
 
 ---
 
@@ -45,8 +46,30 @@ The internet economy was built for humans, not machines.
 ✅ HTTP 402 payment protocol (x402)
 ✅ USDC micropayments on Arc Network
 ✅ Pay-on-Success — agents only pay for working results
+✅ Gasless for agents — executor pays network fees
 ✅ Multi-provider routing for optimal service
 ```
+
+### ⛽ Gasless Agent Architecture
+
+**Agents only sign, they never pay gas.** The executor wallet covers all network fees:
+
+```javascript
+// Agent signs payment authorization
+const signature = await agentWallet.signTypedData(paymentData);
+
+// Executor submits transaction and pays gas
+const tx = await executorWallet.sendTransaction({
+    to: providerAddress,
+    value: paymentAmount,
+    // Executor pays gas, not the agent
+});
+```
+
+**Why this matters:**
+- Agents don't need native tokens for gas
+- Simplified agent wallet management
+- Predictable costs for agent operators
 
 ---
 
