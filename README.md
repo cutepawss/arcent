@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Gemini-AI-orange?style=for-the-badge" alt="Gemini AI"/>
 </p>
 
-# 🔷 Arcent — Agentic Commerce on Arc
+# Arcent — Agentic Commerce on Arc
 
 > **The first x402 implementation on Arc Network with Pay-on-Success Protection**
 
@@ -14,7 +14,7 @@ AI agents that autonomously pay for API access. No human intervention. No credit
 
 ---
 
-## 🏆 Hackathon Submission
+## Hackathon Submission
 
 **Track**: Agentic Commerce on Arc  
 **Demo**: [Live Application](https://arcent.vercel.app)  
@@ -22,35 +22,35 @@ AI agents that autonomously pay for API access. No human intervention. No credit
 
 ---
 
-## 📌 The Problem
+## The Problem
 
 **AI agents can't participate in the economy.**
 
 ```
-❌ AI agents can't have bank accounts
-❌ AI agents can't pass KYC verification
-❌ AI agents can't manage monthly subscriptions
-❌ AI agents can't use credit cards
+- AI agents can't have bank accounts
+- AI agents can't pass KYC verification
+- AI agents can't manage monthly subscriptions
+- AI agents can't use credit cards
 ```
 
 The internet economy was built for humans, not machines.
 
 ---
 
-## 💡 The Solution
+## The Solution
 
 **Arcent gives agents a native economy.**
 
 ```
-✅ Programmable wallets via Circle SDK
-✅ HTTP 402 payment protocol (x402)
-✅ USDC micropayments on Arc Network
-✅ Pay-on-Success — agents only pay for working results
-✅ Gasless for agents — executor pays network fees
-✅ Multi-provider routing for optimal service
++ Programmable wallets via Circle SDK
++ HTTP 402 payment protocol (x402)
++ USDC micropayments on Arc Network
++ Pay-on-Success — agents only pay for working results
++ Gasless for agents — executor pays network fees
++ Multi-provider routing for optimal service
 ```
 
-### ⛽ Gasless Agent Architecture
+### Gasless Agent Architecture
 
 **Agents only sign, they never pay gas.** The executor wallet covers all network fees:
 
@@ -73,7 +73,7 @@ const tx = await executorWallet.sendTransaction({
 
 ---
 
-## 🎯 What Makes Arcent Unique?
+## What Makes Arcent Unique?
 
 Most hackathon projects use blockchain for *storage* or *identity*.
 Arcent uses Arc for what blockchains do best: **payments**.
@@ -88,7 +88,7 @@ Result: AI agents that can **buy services autonomously** without human intervent
 
 ---
 
-## 🛡️ Atomic Settlement — Pay Only on Success
+## Atomic Settlement — Pay Only on Success
 
 **Traditional APIs charge upfront. Arcent charges on success.**
 
@@ -100,7 +100,7 @@ Result: AI agents that can **buy services autonomously** without human intervent
 
 Every x402 implementation follows this flow:
 ```
-1. Agent pays → 2. API is called → 3. If API fails, money is lost ❌
+1. Agent pays → 2. API is called → 3. If API fails, money is lost
 ```
 
 ### Arcent's Innovation: Result-Validated Payment
@@ -109,8 +109,8 @@ We extend x402 with result validation before payment execution:
 ```
 1. Call API first (payment held, not executed)
 2. Validate the response
-3. If valid → Execute payment ✅
-4. If invalid → Cancel payment, agent keeps funds ✅
+3. If valid → Execute payment
+4. If invalid → Cancel payment, agent keeps funds
 ```
 
 ### Technical Implementation
@@ -139,7 +139,7 @@ return { success: true, paid: true, result: apiResult };
 
 ---
 
-## 🔷 Why Arc Network is Essential
+## Why Arc Network is Essential
 
 We didn't just use Arc because it's the hackathon sponsor. 
 **Arc is the ONLY blockchain that makes micropayments practical.**
@@ -150,9 +150,9 @@ For a $0.002 weather API call:
 
 | Chain | API Call | Gas Cost | Total | Overhead |
 |-------|----------|----------|-------|----------|
-| **Ethereum L1** | $0.002 | $7.50 | $7.502 | 3,751x ❌ |
-| **Polygon** | $0.002 | $0.15 | $0.152 | 76x ⚠️ |
-| **Arc Network** | $0.002 | $0.0003 | **$0.0023** | **15%** ✅ |
+| **Ethereum L1** | $0.002 | $7.50 | $7.502 | 3,751x |
+| **Polygon** | $0.002 | $0.15 | $0.152 | 76x |
+| **Arc Network** | $0.002 | $0.0003 | **$0.0023** | **15%** |
 
 ### Arc's Killer Features for Agents
 
@@ -165,7 +165,7 @@ For a $0.002 weather API call:
 
 ---
 
-## ⚡ Performance Benchmarks
+## Performance Benchmarks
 
 *All metrics from real Arc Testnet transactions.*
 
@@ -192,19 +192,19 @@ For a $0.002 weather API call:
 
 ---
 
-## 🆚 Arcent vs Traditional APIs
+## Arcent vs Traditional APIs
 
 | Feature | Traditional APIs | Arcent |
 |---------|-----------------|--------|
 | **Payment** | Credit card subscription | USDC micropayments |
-| **Agent Access** | ❌ Requires human | ✅ Fully autonomous |
-| **Failed Requests** | ❌ Still charged | ✅ Pay-on-Success (no charge) |
+| **Agent Access** | Requires human | Fully autonomous |
+| **Failed Requests** | Still charged | Pay-on-Success (no charge) |
 | **Settlement** | 2-3 days | <2 seconds (Arc) |
-| **KYC Required** | ✅ Yes | ❌ No (programmatic wallet) |
+| **KYC Required** | Yes | No (programmatic wallet) |
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ### Payment Flow
 ```
@@ -262,7 +262,7 @@ For a $0.002 weather API call:
 
 ---
 
-## 🌐 Multi-Provider Network
+## Multi-Provider Network
 
 | Node | Backing | Cost |
 |------|---------|------|
@@ -280,7 +280,7 @@ function routeTask(task) {
 }
 ```
 
-### 🛡️ Provider Scoring System
+### Provider Scoring System
 
 Agents learn which providers are reliable. We track success/failure rates in real-time:
 
@@ -300,7 +300,7 @@ function getProviderScore(provider) {
 
 *Provider scores directly influence routing weight, reducing capital waste over time.*
 
-### 🗄️ Embedded SQL Persistence
+### Embedded SQL Persistence
 
 Arcent uses embedded SQL persistence to store transaction history and provider reliability metrics. **This ensures agent decisions remain auditable across restarts.**
 
@@ -325,7 +325,7 @@ saveTransaction({
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -368,7 +368,7 @@ Open http://localhost:5175
 
 ---
 
-## 🎮 Demo Walkthrough
+## Demo Walkthrough
 
 1. Navigate to **Agent Demo**
 2. Enter a task: `"What's the price of Bitcoin?"`
@@ -382,7 +382,7 @@ Open http://localhost:5175
 
 ---
 
-## 📊 API Reference
+## API Reference
 
 ### x402 Protected Endpoints
 
@@ -394,7 +394,7 @@ Open http://localhost:5175
 
 ---
 
-## 🔐 Security
+## Security
 
 | Layer | Protection |
 |-------|------------|
@@ -405,7 +405,73 @@ Open http://localhost:5175
 
 ---
 
-## � Business Model
+## Spending Controls & Limits
+
+Arcent implements transparent spending controls to protect AI agents from runaway costs.
+
+### Default Limits
+
+| Limit Type | Default | Environment Variable |
+|------------|---------|---------------------|
+| **Per-Transaction** | $0.50 | `MAX_TRANSACTION_AMOUNT` |
+| **Daily** | $10.00 | `DAILY_SPENDING_LIMIT` |
+| **Weekly** | $50.00 | `WEEKLY_SPENDING_LIMIT` |
+| **Monthly** | $100.00 | `MONTHLY_SPENDING_LIMIT` |
+| **Rate Limit** | 30 req/min | `RATE_LIMIT_MAX` |
+| **Low Balance Alert** | $5.00 | `LOW_BALANCE_THRESHOLD` |
+
+### Why These Limits?
+
+For micropayment APIs ($0.002 - $0.02 per call):
+
+| Scenario | Without Limits | With Arcent Limits |
+|----------|---------------|-------------------|
+| Bug causing infinite loop | Unlimited loss | Max $10/day |
+| Compromised agent | Drain entire wallet | Max $100/month |
+| Rate limit attack | 100+ req/min | 30 req/min cap |
+
+### Monitoring Endpoint
+
+```bash
+GET /agent/limits
+```
+
+Returns current spending vs limits:
+```json
+{
+  "limits": {
+    "perTransaction": "$0.50",
+    "daily": "$10.00",
+    "weekly": "$50.00",
+    "monthly": "$100.00"
+  },
+  "currentSpending": {
+    "daily": "$2.50",
+    "weekly": "$15.00",
+    "monthly": "$45.00"
+  },
+  "remaining": {
+    "daily": "$7.50",
+    "weekly": "$35.00",
+    "monthly": "$55.00"
+  },
+  "alerts": {
+    "lowBalance": false,
+    "dailyLimitNear": false
+  }
+}
+```
+
+### Additional Protections
+
+| Protection | Description |
+|------------|-------------|
+| **AI Decision Layer** | Gemini evaluates each payment before approval |
+| **Balance Check** | Agent verifies funds before signing |
+| **CORS Whitelist** | Production restricts origins via `ALLOWED_ORIGINS` |
+| **Request Size** | 1MB max body size |
+
+## Business Model
 
 Arcent is built for Day-1 monetization:
 
@@ -424,9 +490,9 @@ Arcent is built for Day-1 monetization:
 
 ---
 
-## �🗺️ Roadmap
+## Roadmap
 
-### Phase 1: Foundation ✅
+### Phase 1: Foundation (Completed)
 - [x] x402 protocol
 - [x] Circle Wallets
 - [x] Arc Network
@@ -451,13 +517,13 @@ Arcent is built for Day-1 monetization:
 
 ---
 
-## 📄 License
+## License
 
 MIT
 
 ---
 
-## 🔗 Resources
+## Resources
 
 - [x402 Protocol](https://www.x402.org/)
 - [Arc Network](https://www.arc.network/)

@@ -43,11 +43,15 @@ function App() {
   // Provider Scoring Stats
   const [providerStats, setProviderStats] = useState({});
 
+  // Spending Limits
+  const [spendingLimits, setSpendingLimits] = useState(null);
+
   useEffect(() => {
     fetchApis();
     fetchDemoWallet();
     fetchTransactionHistory();
     fetchProviderStats();
+    fetchSpendingLimits();
   }, []);
 
   const fetchProviderStats = async () => {
@@ -71,6 +75,18 @@ function App() {
       }
     } catch (e) {
       console.log('Demo wallet not available');
+    }
+  };
+
+  const fetchSpendingLimits = async () => {
+    try {
+      const res = await fetch(`${API_URL}/agent/limits`);
+      const data = await res.json();
+      if (data.limits) {
+        setSpendingLimits(data);
+      }
+    } catch (e) {
+      console.log('Spending limits not available');
     }
   };
 
@@ -682,6 +698,85 @@ function App() {
                 </div>
               </div>
             </div>
+
+            {/* Spending Limits Card */}
+            {spendingLimits && (
+              <div className="card spending-limits-card">
+                <div className="card-header">
+                  <span className="card-title">Spending Controls</span>
+                  <span className="limits-configurable">Configurable</span>
+                </div>
+                <div className="card-body spending-limits-body">
+                  <div className="limits-grid">
+                    {/* Daily */}
+                    <div className="limit-item">
+                      <div className="limit-header">
+                        <span className="limit-label">Daily</span>
+                        <span className="limit-values">
+                          {spendingLimits.currentSpending?.daily} / {spendingLimits.limits?.daily}
+                        </span>
+                      </div>
+                      <div className="limit-bar-container">
+                        <div
+                          className={`limit-bar ${parseFloat(spendingLimits.percentUsed?.daily) > 80 ? 'limit-high' : ''}`}
+                          style={{ width: spendingLimits.percentUsed?.daily || '0%' }}
+                        />
+                      </div>
+                      <span className="limit-remaining">
+                        {spendingLimits.remaining?.daily} remaining
+                      </span>
+                    </div>
+
+                    {/* Weekly */}
+                    <div className="limit-item">
+                      <div className="limit-header">
+                        <span className="limit-label">Weekly</span>
+                        <span className="limit-values">
+                          {spendingLimits.currentSpending?.weekly} / {spendingLimits.limits?.weekly}
+                        </span>
+                      </div>
+                      <div className="limit-bar-container">
+                        <div
+                          className={`limit-bar ${parseFloat(spendingLimits.percentUsed?.weekly) > 80 ? 'limit-high' : ''}`}
+                          style={{ width: spendingLimits.percentUsed?.weekly || '0%' }}
+                        />
+                      </div>
+                      <span className="limit-remaining">
+                        {spendingLimits.remaining?.weekly} remaining
+                      </span>
+                    </div>
+
+                    {/* Monthly */}
+                    <div className="limit-item">
+                      <div className="limit-header">
+                        <span className="limit-label">Monthly</span>
+                        <span className="limit-values">
+                          {spendingLimits.currentSpending?.monthly} / {spendingLimits.limits?.monthly}
+                        </span>
+                      </div>
+                      <div className="limit-bar-container">
+                        <div
+                          className={`limit-bar ${parseFloat(spendingLimits.percentUsed?.monthly) > 80 ? 'limit-high' : ''}`}
+                          style={{ width: spendingLimits.percentUsed?.monthly || '0%' }}
+                        />
+                      </div>
+                      <span className="limit-remaining">
+                        {spendingLimits.remaining?.monthly} remaining
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="limits-footer">
+                    <span className="limits-rate">
+                      Rate: {spendingLimits.limits?.rateLimit}
+                    </span>
+                    <span className="limits-note">
+                      Limits configurable via environment variables
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Agent Process Log */}
             {agentSteps.length > 0 && (

@@ -3345,3 +3345,125 @@ body {
   font-style: italic;
   margin-bottom: 1rem;
 }
+
+/* =====================
+   Spending Limits Card
+   ===================== */
+
+.spending-limits-card {
+  margin-bottom: 1.5rem;
+}
+
+.spending-limits-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.limits-configurable {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--beige);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.spending-limits-body {
+  padding: 1.25rem;
+}
+
+.limits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.limit-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.limit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.limit-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.limit-values {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  font-family: 'SF Mono', 'Monaco', monospace;
+}
+
+.limit-bar-container {
+  height: 6px;
+  background: var(--beige);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.limit-bar {
+  height: 100%;
+  background: var(--navy);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.limit-bar.limit-high {
+  background: var(--navy-light);
+  box-shadow: 0 0 4px rgba(26, 39, 68, 0.3);
+}
+
+.limit-remaining {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.limits-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--beige);
+}
+
+.limits-rate {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--navy);
+  background: var(--cream-dark);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.limits-note {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .limits-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .limits-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}

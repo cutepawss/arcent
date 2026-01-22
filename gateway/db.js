@@ -181,11 +181,72 @@ export async function getDatabaseStats() {
     }
 }
 
+/**
+ * Get total spending for a time period
+ * @param {string} period - 'daily', 'weekly', or 'monthly'
+ * @returns {number} Total spending in USD
+ */
+export async function getSpendingByPeriod(period = 'daily') {
+    try {
+        let since;
+        const now = new Date();
+
+        switch (period) {
+            case 'daily':
+                since = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+                break;
+            case 'weekly':
+                const weekAgo = new Date(now);
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                since = weekAgo.toISOString();
+                break;
+            case 'monthly':
+                since = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+                break;
+            default:
+                since = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+        }
+
+        const result = await db.execute({
+            sql: `SELECT COALESCE(SUM(CAST(amount AS REAL)), 0) as total 
+                  FROM transactions 
+                  WHERE timestamp >= ? AND status = 'success'`,
+            args: [since]
+        });
+
+        return parseFloat(result.rows[0]?.total || 0);
+    } catch (error) {
+        console.error('[DB] Failed to get spending by period:', error.message);
+        return 0;
+    }
+}
+
+/**
+ * Get all spending limits status
+ * @returns {Object} Current spending vs limits for all periods
+ */
+export async function getSpendingStatus() {
+    try {
+        const [daily, weekly, monthly] = await Promise.all([
+            getSpendingByPeriod('daily'),
+            getSpendingByPeriod('weekly'),
+            getSpendingByPeriod('monthly')
+        ]);
+
+        return { daily, weekly, monthly };
+    } catch (error) {
+        console.error('[DB] Failed to get spending status:', error.message);
+        return { daily: 0, weekly: 0, monthly: 0 };
+    }
+}
+
 export default {
     saveTransaction,
     persistProviderStats,
     loadProviderStats,
     getTransactionHistory,
     getTransactionsByProvider,
-    getDatabaseStats
+    getDatabaseStats,
+    getSpendingByPeriod,
+    getSpendingStatus
 };

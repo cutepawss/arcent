@@ -11,7 +11,7 @@ import circleWallet from './services/circleWallet.js';
 import x402Client from './services/x402Client.js';
 import arcExecutor from './services/arcExecutor.js';
 // SQLite persistence
-import { saveTransaction, persistProviderStats, loadProviderStats, getTransactionHistory, getDatabaseStats } from './db.js';
+import { saveTransaction, persistProviderStats, loadProviderStats, getTransactionHistory, getDatabaseStats, getSpendingByPeriod, getSpendingStatus } from './db.js';
 
 dotenv.config();
 
@@ -36,10 +36,23 @@ app.use(cors({
     credentials: true
 }));
 
+// =====================
+// SPENDING LIMITS & CONTROLS
+// =====================
+const SPENDING_LIMITS = {
+    PER_TRANSACTION: parseFloat(process.env.MAX_TRANSACTION_AMOUNT) || 0.50,  // $0.50 max per transaction
+    DAILY: parseFloat(process.env.DAILY_SPENDING_LIMIT) || 10.00,              // $10/day
+    WEEKLY: parseFloat(process.env.WEEKLY_SPENDING_LIMIT) || 50.00,            // $50/week
+    MONTHLY: parseFloat(process.env.MONTHLY_SPENDING_LIMIT) || 100.00,         // $100/month
+    LOW_BALANCE_THRESHOLD: parseFloat(process.env.LOW_BALANCE_THRESHOLD) || 5.00  // Alert at $5
+};
+
+console.log('[Server] Spending Limits loaded:', SPENDING_LIMITS);
+
 // Rate Limiting - protect against abuse
 const rateLimit = new Map();
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
-const RATE_LIMIT_MAX = process.env.RATE_LIMIT_MAX ? parseInt(process.env.RATE_LIMIT_MAX) : 100; // 100 requests per minute
+const RATE_LIMIT_MAX = process.env.RATE_LIMIT_MAX ? parseInt(process.env.RATE_LIMIT_MAX) : 30; // 30 requests per minute (reduced from 100)
 
 const rateLimitMiddleware = (req, res, next) => {
     const ip = req.ip || req.connection.remoteAddress;
@@ -1532,6 +1545,77 @@ app.get('/db/stats', async (req, res) => {
         tables: ['transactions', 'provider_stats']
     });
 });
+
+// =====================
+// Spending Limits Endpoint
+// =====================
+
+app.get('/agent/limits', async (req, res) => {
+    try {
+        const spending = await getSpendingStatus();
+        const wallet = await circleWallet.getDemoWallet();
+        const balance = wallet?.balance || 0;
+
+        res.json({
+            limits: {
+                perTransaction: `$${SPENDING_LIMITS.PER_TRANSACTION.toFixed(2)}`,
+                daily: `$${SPENDING_LIMITS.DAILY.toFixed(2)}`,
+                weekly: `$${SPENDING_LIMITS.WEEKLY.toFixed(2)}`,
+                monthly: `$${SPENDING_LIMITS.MONTHLY.toFixed(2)}`,
+                rateLimit: `${RATE_LIMIT_MAX} requests/minute`
+            },
+            currentSpending: {
+                daily: `$${spending.daily.toFixed(4)}`,
+                weekly: `$${spending.weekly.toFixed(4)}`,
+                monthly: `$${spending.monthly.toFixed(4)}`
+            },
+            remaining: {
+                daily: `$${Math.max(0, SPENDING_LIMITS.DAILY - spending.daily).toFixed(2)}`,
+                weekly: `$${Math.max(0, SPENDING_LIMITS.WEEKLY - spending.weekly).toFixed(2)}`,
+                monthly: `$${Math.max(0, SPENDING_LIMITS.MONTHLY - spending.monthly).toFixed(2)}`
+            },
+            percentUsed: {
+                daily: `${Math.min(100, (spending.daily / SPENDING_LIMITS.DAILY * 100)).toFixed(1)}%`,
+                weekly: `${Math.min(100, (spending.weekly / SPENDING_LIMITS.WEEKLY * 100)).toFixed(1)}%`,
+                monthly: `${Math.min(100, (spending.monthly / SPENDING_LIMITS.MONTHLY * 100)).toFixed(1)}%`
+            },
+            alerts: {
+                lowBalance: balance <= SPENDING_LIMITS.LOW_BALANCE_THRESHOLD,
+                dailyLimitNear: spending.daily >= SPENDING_LIMITS.DAILY * 0.8,
+                weeklyLimitNear: spending.weekly >= SPENDING_LIMITS.WEEKLY * 0.8
+            },
+            walletBalance: `$${balance.toFixed(2)}`
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to get limits', details: error.message });
+    }
+});
+
+// Helper function to check spending limits before payment
+async function checkSpendingLimits(amount) {
+    const spending = await getSpendingStatus();
+
+    const checks = {
+        perTransaction: amount <= SPENDING_LIMITS.PER_TRANSACTION,
+        daily: (spending.daily + amount) <= SPENDING_LIMITS.DAILY,
+        weekly: (spending.weekly + amount) <= SPENDING_LIMITS.WEEKLY,
+        monthly: (spending.monthly + amount) <= SPENDING_LIMITS.MONTHLY
+    };
+
+    const passed = Object.values(checks).every(v => v);
+
+    return {
+        passed,
+        checks,
+        spending,
+        limits: SPENDING_LIMITS,
+        reason: !passed ?
+            (!checks.perTransaction ? `Amount $${amount} exceeds per-transaction limit of $${SPENDING_LIMITS.PER_TRANSACTION}` :
+                !checks.daily ? `Daily limit of $${SPENDING_LIMITS.DAILY} would be exceeded` :
+                    !checks.weekly ? `Weekly limit of $${SPENDING_LIMITS.WEEKLY} would be exceeded` :
+                        `Monthly limit of $${SPENDING_LIMITS.MONTHLY} would be exceeded`) : null
+    };
+}
 
 // =====================
 // Health Check
